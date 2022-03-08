@@ -1,23 +1,44 @@
 from typing import Any, Union, Optional, Tuple
-
-import librosa.effects
-
-from audiofilter.utils import DEFAULT_SAMPLE_RATE
+from audiofilter.utils import (
+    DEFAULT_SAMPLE_RATE, DEFAULT_SNR_LEVEL_DB
+)
+from audiofilter.audio.utils import validate_load_audio
+from audiofilter.audio.noise import gaussian_noise
 
 import utils as audutils
 import numpy as np
-
-import fitfilt
+import librosa.effects
 
 
 def add_background_noise(
         audio: Union[np.ndarray, str],
         sample_rate: int = DEFAULT_SAMPLE_RATE,
-        snr_level_db: float = 10.0,
+        snr_level_db: Optional[Union[float, int]] = DEFAULT_SNR_LEVEL_DB,
+        method: Optional[str] = 'vectorized',
         background_noise: Optional[Union[str, np.ndarray]] = None,
-        output_path: Optional[str] = None,
 ) -> Tuple[np.ndarray, int]:
-    pass
+    audio, sample_rate = validate_load_audio(audio, sample_rate)
+    assert isinstance(snr_level_db, (int, float)), "Expected 'snr_level_db' to be a number"
+    assert method in ['vectorized', 'maxen', 'axial'], f"Invalid method {method} "
+    if method == 'vectorized':
+        Ps = np.sum(audio ** 2 / audio.size)
+    elif method == 'maxen':
+        Ps = np.max(np.sum(audio ** 2 / audio.shape[0], axis=0))
+    else:
+        Ps = np.sum(audio ** 2 / audio.shape[0], axis=0)
+
+    Psdb = 10 * np.log10(Ps)
+    Pn = Psdb - snr_level_db
+    if isinstance(background_noise, str):
+        assert background_noise in ['gaussian'], f"Invalid noise {background_noise}"
+        if background_noise == 'gaussian':
+            audio, sample_rate = gaussian_noise(audio, Pn, sample_rate)
+
+    else:
+        assert audio.shape == background_noise.shape
+        audio = audio + background_noise
+
+    return audio, sample_rate
 
 
 def speed(
