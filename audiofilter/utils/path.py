@@ -2,7 +2,7 @@ from typing import Optional
 
 import os
 
-MODULE_DIR = os.path.join(os.path.dirname(__file__))
+MODULE_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
 ASSETS_DIR = os.path.join(MODULE_DIR, 'assets')
 AUDIO_ASSETS_DIR = os.path.join(ASSETS_DIR, 'audio')
 EXAMPLE_DIR = os.path.join(AUDIO_ASSETS_DIR, 'example')
@@ -24,3 +24,8 @@ def get_local_path(filename: str):
     file_dir = os.path.join(DEFAULT_INPUT_DIR, filename)
     validate_path(file_dir)
     return file_dir
+
+
+def examples(name: str) -> str:
+    assert name in ["Hnoise", "Lnoise", "me", "Mnoise", "nuonuo", "Snoise"], f'Not found example {name}'
+    return os.path.join(EXAMPLE_DIR, f'{name}.wav')

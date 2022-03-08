@@ -1,5 +1,8 @@
 from typing import Union, Optional, Tuple
 from numpy import tan, pi
+from audiofilter.utils import (
+    DEFAULT_N_LEVEL, DEFAULT_CUTOFF_HZ, DEFAULT_START_HZ
+)
 
 import audiofilter.audio.utils as audutils
 import numpy as np
@@ -9,8 +12,8 @@ import scipy.signal as signal
 def fit_highpass_filter(
         audio: Union[str, np.ndarray],
         sample_rate: Union[int, float],
-        cutoff_hz: float = 3000.,
-        N: Optional[int] = 8,
+        cutoff_hz: float = DEFAULT_CUTOFF_HZ,
+        N: Optional[int] = DEFAULT_N_LEVEL,
         Rp: Optional[float] = None,
         As: Optional[float] = None,
         cutoff_hz2: Optional[float] = None
@@ -19,8 +22,7 @@ def fit_highpass_filter(
     assert isinstance(N, int), "Expect 'N' to be an int"
     audio, sample_rate = audutils.validate_load_audio(audio, sample_rate)
 
-    n_channels = 1 if audio.ndim == 1 else audio.shape[0]
-    audio.reshape(n_channels, -1)
+    n_channels = audio.ndim
 
     T = 1. / sample_rate
     if Rp or As:
@@ -42,8 +44,8 @@ def fit_highpass_filter(
 def fit_lowpass_filter(
         audio: Union[str, np.ndarray],
         sample_rate: Union[int, float],
-        cutoff_hz: float = 3000.,
-        N: Optional[int] = 8,
+        cutoff_hz: float = DEFAULT_CUTOFF_HZ,
+        N: Optional[int] = DEFAULT_N_LEVEL,
         Rp: Optional[float] = None,
         As: Optional[float] = None,
         cutoff_hz2: Optional[float] = None
@@ -52,8 +54,8 @@ def fit_lowpass_filter(
     assert isinstance(N, int), "Expect 'N' to be an int"
     audio, sample_rate = audutils.validate_load_audio(audio, sample_rate)
 
-    n_channels = 1 if audio.ndim == 1 else audio.shape[0]
-    audio.reshape(n_channels, -1)
+    n_channels = audio.ndim
+    # audio.reshape(n_channels, -1)
 
     T = 1. / sample_rate
     if Rp or As:
@@ -75,9 +77,9 @@ def fit_lowpass_filter(
 def fit_band_filter(
         audio: Union[str, np.ndarray],
         sample_rate: Union[int, float],
-        start_hz: float = 2000.,
-        cutoff_hz: float = 3000.,
-        N: Optional[int] = 8,
+        start_hz: float = DEFAULT_START_HZ,
+        cutoff_hz: float = DEFAULT_CUTOFF_HZ,
+        N: Optional[int] = DEFAULT_N_LEVEL,
         Rp: Optional[float] = None,
         As: Optional[float] = None,
         cutoff_hz2: Optional[float] = None
