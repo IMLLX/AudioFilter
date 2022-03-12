@@ -1,11 +1,9 @@
 from audiofilter.audio import (
     add_background_noise,
     speed,
-    fit_highpass_filter,
-    fit_band_filter,
-    fit_lowpass_filter,
     validate_load_audio,
-    play_sound
+    play_sound,
+    save_audio,
 )
 
 from audiofilter.display import (
@@ -14,13 +12,19 @@ from audiofilter.display import (
 
 from audiofilter.utils import (examples)
 
+from audiofilter.filter import (
+    fit_FIR_filter, fit_IIR_filter, FIR_filter_design, IIR_filter_design,
+)
+
 __all__ = [
     'add_background_noise',
     'speed',
-    'fit_highpass_filter',
-    'fit_lowpass_filter',
-    'fit_band_filter',
     'freq_plot',
     'wave_plot',
-    'examples'
+    'examples',
+    'save_audio',
+    'fit_IIR_filter',
+    'fit_FIR_filter',
+    'FIR_filter_design',
+    'IIR_filter_design'
 ]

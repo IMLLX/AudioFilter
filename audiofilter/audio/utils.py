@@ -1,6 +1,7 @@
 import os.path
+import time
 from typing import Union, Tuple, Optional
-from audiofilter.utils import (
+from ..utils import (
     DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR
 )
 
@@ -28,11 +29,10 @@ def validate_load_audio(
 
 def save_audio(
         audio: Union[str, np.ndarray],
-        filename: str,
         sample_rate: int = utils.DEFAULT_SAMPLE_RATE,
-        output_path: Optional[str] = DEFAULT_INPUT_DIR,
-) -> Tuple[np.ndarray, int]:
-    save_path = os.path.join(output_path, filename)
+        save_path: Optional[str] = os.path.join(DEFAULT_OUTPUT_DIR, f'{time.time()}.wav'),
+) -> str:
+    # save_path = os.path.join(output_path, filename)
     utils.validate_output_path(save_path)
 
     try:
@@ -40,8 +40,9 @@ def save_audio(
         # but soundfile expects it to be (num_samples, num_channels) when
         # writing it out, so we have to swap axes here.
         saved_audio = np.swapaxes(audio, 0, 1) if audio.ndim > 1 else audio
-        sf.write(output_path, saved_audio, sample_rate)
+        sf.write(save_path, saved_audio, sample_rate)
     except Exception as e:
+        print(e)
         pass
 
-    return audio, sample_rate
+    return save_path

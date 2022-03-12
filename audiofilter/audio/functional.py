@@ -6,17 +6,19 @@ from .noise import (gaussian_noise)
 import numpy as np
 import librosa.effects
 
+AVAILABLE_NOISE_METHOD = ['vectorized', 'maxen', 'axial']
+
 
 def add_background_noise(
         audio: Union[np.ndarray, str],
         sample_rate: int = DEFAULT_SAMPLE_RATE,
         snr_level_db: Optional[Union[float, int]] = DEFAULT_SNR_LEVEL_DB,
         method: Optional[str] = 'vectorized',
-        background_noise: Optional[Union[str, np.ndarray]] = None,
+        background_noise: Optional[Union[str, np.ndarray]] = 'gaussian',
 ) -> Tuple[np.ndarray, int]:
     audio, sample_rate = validate_load_audio(audio, sample_rate)
     assert isinstance(snr_level_db, (int, float)), "Expected 'snr_level_db' to be a number"
-    assert method in ['vectorized', 'maxen', 'axial'], f"Invalid method {method} "
+    assert method in AVAILABLE_NOISE_METHOD, f"Invalid method {method} "
     if method == 'vectorized':
         Ps = np.sum(audio ** 2 / audio.size)
     elif method == 'maxen':
@@ -26,11 +28,11 @@ def add_background_noise(
 
     Psdb = 10 * np.log10(Ps)
     Pn = Psdb - snr_level_db
-    if isinstance(background_noise, str):
+    if background_noise and isinstance(background_noise, str):
         assert background_noise in ['gaussian'], f"Invalid noise {background_noise}"
         if background_noise == 'gaussian':
             audio, sample_rate = gaussian_noise(audio, Pn, sample_rate)
-        #TODO band_gaussian_noise
+        # TODO band_gaussian_noise
     else:
         assert audio.shape == background_noise.shape
         audio = audio + background_noise

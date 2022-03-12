@@ -1,5 +1,7 @@
-from typing import Optional
+from typing import Optional, Tuple
 
+import audiofilter.audio as audio
+import numpy as np
 import os
 
 MODULE_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
@@ -26,6 +28,6 @@ def get_local_path(filename: str):
     return file_dir
 
 
-def examples(name: str) -> str:
+def examples(name: str) -> Tuple[np.ndarray, int]:
     assert name in ["Hnoise", "Lnoise", "me", "Mnoise", "nuonuo", "Snoise"], f'Not found example {name}'
-    return os.path.join(EXAMPLE_DIR, f'{name}.wav')
+    return audio.validate_load_audio(os.path.join(EXAMPLE_DIR, f'{name}.wav'))

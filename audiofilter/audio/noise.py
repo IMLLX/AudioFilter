@@ -16,8 +16,3 @@ def gaussian_noise(
     noise = np.sqrt(10 ** (Pn / 10)) * np.random.normal(0, 1, audio.shape)
     return audio + noise, sample_rate
 
-
-def band_gaussian_noise(
-
-) -> Tuple[np.ndarray, int]:
-    pass
