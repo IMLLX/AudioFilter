@@ -200,7 +200,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.alert('Error', 'Please input an audio first')
 
     def refresh_fig(self):
-        [ax.clear() for ax in self.axes]
+        for ax_ in self.axes:
+            ax_.cla()
+        # 防止画图界面假死
+        self.canvas.draw()
 
     def output_audio(self):
         if self.curr_playing:
@@ -223,6 +226,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 class FilterDesign(QMainWindow, Ui_FilterDesign):
     emit_signal = pyqtSignal(str)
+    reg = QRegExp('[0-9.]+$')
 
     def __init__(self, audio, sample_rate, *args, **kwargs):
         super(FilterDesign, self).__init__(*args, **kwargs)
@@ -233,27 +237,45 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
         [self.IRR_type_combo.addItem(i) for i in af.filter.ALLOWED_IIR_TYPES]
         self.band_type_combo.currentIndexChanged[str].connect(self.check_band_type)
         self.FIR_IRR_type_combo.currentIndexChanged[str].connect(self.check_fir_irr_type)
+        self.IRR_type_combo.currentIndexChanged[str].connect(self.check_cheby_type)
 
-        # self.Rp_text.textChanged.connect(self.Rp_As_changed)
+        # self.rp_line.textChanged.connect(self.Rp_As_changed)
 
         self.band_type = self.band_type_combo.currentText()
         self.fir_irr_type = self.FIR_IRR_type_combo.currentText()
 
-        self.Rp_text.setText(str(af.filter.DEFAULT_RP))
-        self.As_text.setText(str(af.filter.DEFAULT_AS))
+        self.Rp_line.setText(str(af.filter.DEFAULT_RP))
+        self.As_line.setText(str(af.filter.DEFAULT_AS))
+        self.rs_line.setText(str(af.filter.DEFAULT_RS_IN))
+        self.rp_line.setText(str(af.filter.DEFAULT_RP_IN))
 
-        self.fig, self.axes = plt.subplots(1, 2)
+        # TODO : Validator
+        self.validator = QDoubleValidator()
+        self.sample_rate_line.setValidator(self.validator)
+        self.rp_line.setValidator(self.validator)
+        self.rs_line.setValidator(self.validator)
+        self.fp_2_line.setValidator(self.validator)
+        self.fst_2_line.setValidator(self.validator)
+        self.fp_1_line.setValidator(self.validator)
+        self.fst_2_line.setValidator(self.validator)
+        self.fst_1_line.setValidator(self.validator)
+        self.As_line.setValidator(self.validator)
+        self.Rp_line.setValidator(self.validator)
+
+        self.fig, self.axes = plt.subplots(2, 2)
         self.canvas = FigureCanvas(self.fig)
         self.currWidget = self.verticalLayout.addWidget(self.canvas)
+        self.canvas.draw()
 
         self.audio, self.sample_rate = audio, sample_rate
         self.plot_audio_wave()
 
+        self.check_cheby_type()
         self.check_band_type()
         self.check_fir_irr_type()
 
-        self.sample_rate_text.setText(str(self.sample_rate))
-        self.sample_rate_text.setDisabled(True)
+        self.sample_rate_line.setText(str(self.sample_rate))
+        self.sample_rate_line.setDisabled(True)
 
         self.cancel_button.clicked.connect(lambda: self.close())
         self.confirm_button.clicked.connect(self.confirm_act)
@@ -267,14 +289,14 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
 
     def check_band_type(self):
         self.band_type = self.band_type_combo.currentText()
-        if self.band_type == 'bandpass':
-            self.fp_2_text.setVisible(True)
-            self.fst_2_text.setVisible(True)
+        if self.band_type in ['bandpass', 'bandstop']:
+            self.fp_2_line.setVisible(True)
+            self.fst_2_line.setVisible(True)
             self.fst_2_label.setVisible(True)
             self.fp_2_label.setVisible(True)
         else:
-            self.fp_2_text.setVisible(False)
-            self.fst_2_text.setVisible(False)
+            self.fp_2_line.setVisible(False)
+            self.fst_2_line.setVisible(False)
             self.fst_2_label.setVisible(False)
             self.fp_2_label.setVisible(False)
 
@@ -286,54 +308,118 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
         else:
             self.IRR_type_combo.setVisible(True)
             self.FIR_type_combo.setVisible(False)
+            self.check_cheby_type()
+
+    def check_cheby_type(self):
+        irr_type = self.IRR_type_combo.currentText()
+        if self.fir_irr_type == 'IIR' and irr_type in ['chebyI', 'chebyII', 'ellip']:
+            if irr_type == 'chebyI':
+                self.rp_line.setVisible(True)
+                self.cheby_rp.setVisible(True)
+                self.rs_line.setVisible(False)
+                self.cheby_rs.setVisible(False)
+            elif irr_type == 'chebyII':
+                self.rp_line.setVisible(False)
+                self.cheby_rp.setVisible(False)
+                self.rs_line.setVisible(True)
+                self.cheby_rs.setVisible(True)
+            else:
+                self.rp_line.setVisible(True)
+                self.cheby_rp.setVisible(True)
+                self.rs_line.setVisible(True)
+                self.cheby_rs.setVisible(True)
+        else:
+            self.rs_line.setVisible(False)
+            self.cheby_rs.setVisible(False)
+            self.rp_line.setVisible(False)
+            self.cheby_rp.setVisible(False)
 
     def plot_filter_figure(self):
         try:
-            fp1 = float(self.fp_1_text.toPlainText()) if self.fp_1_text.toPlainText() else None
-            fst1 = float(self.fst_1_text.toPlainText()) if self.fst_1_text.toPlainText() else None
-            fp2 = float(self.fp_2_text.toPlainText()) if self.fp_2_text.toPlainText() else None
-            fst2 = float(self.fst_2_text.toPlainText()) if self.fst_2_text.toPlainText() else None
-            Rp1 = float(self.Rp_text.toPlainText())
-            As1 = float(self.As_text.toPlainText())
+            fp1 = float(self.fp_1_line.text()) if self.fp_1_line.text() else None
+            fst1 = float(self.fst_1_line.text()) if self.fst_1_line.text() else None
+            fp2 = float(self.fp_2_line.text()) if self.fp_2_line.text() else None
+            fst2 = float(self.fst_2_line.text()) if self.fst_2_line.text() else None
+            rs = float(self.rs_line.text()) if self.rs_line.text() else None
+            rp = float(self.rp_line.text()) if self.rp_line.text() else None
+            Rp1 = float(self.rp_line.text())
+            As1 = float(self.As_line.text())
             if self.fir_irr_type == 'IIR':
                 irr_type = self.IRR_type_combo.currentText()
-                if (fp1 and fst1) and self.band_type != 'bandpass':
-                    self.axes[1].clear()
+                if (fp1 and fst1) and self.band_type not in ['bandpass', 'bandstop']:
                     b, a = af.filter.IIR_filter_design(self.sample_rate,
                                                        self.band_type,
                                                        irr_type,
                                                        fp1,
                                                        fst1,
                                                        Rp=Rp1,
-                                                       As=As1)
+                                                       As=As1,
+                                                       ax=self.axes[1, 1],
+                                                       cla=True)
+                    self.canvas.draw_idle()
                     if b.any() and a.any():
                         self.tem_audio, self.tem_sample_rate = af.fit_IIR_filter(self.audio, self.sample_rate, b, a)
-                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[1])
+                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0, 1], True)
                 elif fp1 and fst1 and fp2 and fst2:
                     # TODO bandpass filter
-                    pass
+                    b, a = af.filter.IIR_band_filter_design(self.sample_rate,
+                                                            self.band_type,
+                                                            irr_type,
+                                                            fp1,
+                                                            fst1,
+                                                            fp2,
+                                                            fst2,
+                                                            rs,
+                                                            rp,
+                                                            Rp=Rp1,
+                                                            As=As1,
+                                                            ax=self.axes[1, 1],
+                                                            cla=True)
+                    self.canvas.draw_idle()
+                    if b.any() and a.any():
+                        self.tem_audio, self.tem_sample_rate = af.fit_IIR_filter(self.audio, self.sample_rate, b, a)
+                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0, 1], True)
             else:
-                # TODO IIR Filter
-                if (fp1 and fst1) and self.band_type != 'bandpass':
-                    self.axes[1].clear()
+                # TODO FIR Filter
+                if (fp1 and fst1) and self.band_type not in ['bandpass', 'bandstop']:
                     win_type = self.FIR_type_combo.currentText()
                     b = af.filter.FIR_filter_design(self.sample_rate,
+                                                    self.band_type,
                                                     win_type,
                                                     fp1,
                                                     fst1,
                                                     Rp=Rp1,
-                                                    As=As1)
+                                                    As=As1,
+                                                    ax=self.axes[1, 1],
+                                                    cla=True)
+                    self.canvas.draw_idle()
                     if b.any():
                         self.tem_audio, self.tem_sample_rate = af.fit_FIR_filter(self.audio, self.sample_rate, b)
-                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[1])
+                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0, 1], True)
                 elif fp1 and fst1 and fp2 and fst2:
                     # TODO bandpass filter
-                    pass
+                    win_type = self.FIR_type_combo.currentText()
+                    b = af.filter.FIR_band_filter_design(self.sample_rate,
+                                                         self.band_type,
+                                                         win_type,
+                                                         fp1,
+                                                         fst1,
+                                                         fp2,
+                                                         fst2,
+                                                         Rp=Rp1,
+                                                         As=As1,
+                                                         ax=self.axes[1, 1],
+                                                         cla=True)
+                    self.canvas.draw_idle()
+                    if b.any():
+                        self.tem_audio, self.tem_sample_rate = af.fit_FIR_filter(self.audio, self.sample_rate, b)
+                        af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0, 1], True)
         except Exception as e:
             print(e)
 
     def plot_audio_wave(self):
-        af.wave_plot(self.audio, self.sample_rate, self.axes[0])
+        af.wave_plot(self.audio, self.sample_rate, self.axes[0, 0])
+        af.freq_plot(self.audio, self.sample_rate, self.axes[1, 0])
 
     def confirm_act(self):
         if self.tem_audio.any() and self.tem_sample_rate:
@@ -374,7 +460,7 @@ class AddNoise(QMainWindow, Ui_AddNoise):
         pass
 
     def plot_noise_figure(self):
-        snr_level = float(self.SNR_Level_text.toPlainText()) if self.SNR_Level_text.toPlainText() else None
+        snr_level = float(self.SNR_Level_line.text()) if self.SNR_Level_line.text() else None
         if snr_level:
             self.tem_audio, self.tem_sample_rate = af.add_background_noise(
                 self.audio, self.sample_rate, snr_level, self.method_combo.currentText()

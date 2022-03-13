@@ -30,12 +30,11 @@ def validate_load_audio(
 def save_audio(
         audio: Union[str, np.ndarray],
         sample_rate: int = utils.DEFAULT_SAMPLE_RATE,
-        save_path: Optional[str] = os.path.join(DEFAULT_OUTPUT_DIR, f'{time.time()}.wav'),
+        save_path: Optional[str] = os.path.join(DEFAULT_OUTPUT_DIR,
+                                                f'{time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())}.wav'),
 ) -> str:
-    # save_path = os.path.join(output_path, filename)
-    utils.validate_output_path(save_path)
-
     try:
+        utils.validate_output_path(save_path)
         # Note: librosa reads in audio data as (num_channels, num_samples),
         # but soundfile expects it to be (num_samples, num_channels) when
         # writing it out, so we have to swap axes here.

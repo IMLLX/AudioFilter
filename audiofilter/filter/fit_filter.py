@@ -21,4 +21,4 @@ def fit_FIR_filter(
         b: int,
 ) -> Tuple[np.ndarray, int]:
     filt_data = signal.filtfilt(b, 1, x=audio)
-    return audio, sample_rate
+    return filt_data, sample_rate

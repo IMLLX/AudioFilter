@@ -17,8 +17,11 @@ def wave_plot(
         audio: Union[np.ndarray, str],
         sample_rate: int = DEFAULT_SAMPLE_RATE,
         ax1=None,
+        cla: bool = False
 ):
     audio, sample_rate = validate_load_audio(audio, sample_rate)
+    if cla:
+        ax1.cla()
     librosa.display.waveshow(audio, sr=sample_rate, ax=ax1)
     ax1.set_title('Time wave')
     ax1.set_ylabel('Amplitude [relative]')
@@ -29,11 +32,14 @@ def freq_plot(
         audio: Union[np.ndarray, str],
         sample_rate: int = DEFAULT_SAMPLE_RATE,
         ax=None,
+        cla: bool = False
 ):
     audio, sample_rate = validate_load_audio(audio, sample_rate)
     n_channels, sample_points = audio.ndim, audio.shape[0]
     audio_fft = fft(audio, axis=0) / sample_points
     freq = fftfreq(sample_points, 1.0 / sample_rate)
+    if cla:
+        ax.cla()
     ax.plot(freq, abs(audio_fft))
     ax.set_title('Frequency response')
     ax.set_xlabel('Frequency [Hz]')
