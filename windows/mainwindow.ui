@@ -252,6 +252,7 @@
     </property>
     <addaction name="add_noise_action"/>
     <addaction name="fit_filt_action"/>
+    <addaction name="actionSTFT"/>
    </widget>
    <addaction name="menuFIle"/>
    <addaction name="menuDraw"/>
@@ -303,6 +304,11 @@
   <action name="save_action">
    <property name="text">
     <string>Save Image</string>
+   </property>
+  </action>
+  <action name="actionSTFT">
+   <property name="text">
+    <string>STFT</string>
    </property>
   </action>
  </widget>

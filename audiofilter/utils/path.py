@@ -10,6 +10,7 @@ AUDIO_ASSETS_DIR = os.path.join(ASSETS_DIR, 'audio')
 EXAMPLE_DIR = os.path.join(AUDIO_ASSETS_DIR, 'example')
 DEFAULT_OUTPUT_DIR = os.path.join(AUDIO_ASSETS_DIR, 'output')
 DEFAULT_INPUT_DIR = os.path.join(AUDIO_ASSETS_DIR, 'input')
+EXAMPLES_LIST = ["Hnoise", "Lnoise", "me", "Mnoise", "nuonuo", "Snoise"]
 
 
 def validate_path(path: str):
@@ -29,5 +30,10 @@ def get_local_path(filename: str):
 
 
 def examples(name: str) -> Tuple[np.ndarray, int]:
-    assert name in ["Hnoise", "Lnoise", "me", "Mnoise", "nuonuo", "Snoise"], f'Not found example {name}'
+    assert name in EXAMPLES_LIST, f'Not found example {name}'
     return audio.validate_load_audio(os.path.join(EXAMPLE_DIR, f'{name}.wav'))
+
+
+def get_example(name: str) -> str:
+    assert name in EXAMPLES_LIST, f'Not found example {name}'
+    return os.path.join(EXAMPLE_DIR, f'{name}.wav')

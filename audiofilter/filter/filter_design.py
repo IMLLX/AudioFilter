@@ -1,9 +1,10 @@
 from typing import Optional, Union, Any
 from .content import (
-    DEFAULT_RP, DEFAULT_AS, DEFAULT_N_VALUE, DEFAULT_RS_IN, DEFAULT_RP_IN
+    DEFAULT_GSTOP, DEFAULT_GPASS, DEFAULT_N_VALUE, DEFAULT_RS, DEFAULT_RP
 )
 import numpy as np
 import scipy.signal as signal
+import audiofilter.display as display
 
 pi = np.pi
 tan = np.tan
@@ -15,13 +16,12 @@ def IIR_filter_design(
         irr_type: str,
         fp1: float,
         fst1: float,
-        fp2: Optional[float] = None,
-        fst2: Optional[float] = None,
-        rs: Optional[float] = DEFAULT_RS_IN,
-        rp: Optional[float] = DEFAULT_RP_IN,
+        gs: Optional[float] = DEFAULT_GSTOP,
+        gp: Optional[float] = DEFAULT_GPASS,
         Rp: Optional[float] = DEFAULT_RP,
-        As: Optional[float] = DEFAULT_AS,
+        Rs: Optional[float] = DEFAULT_RS,
         ax=None,
+        ax1=None,
         cla: bool = False
 ):
     Fs = sample_rate
@@ -31,17 +31,17 @@ def IIR_filter_design(
     omega_p = (2 / T) * tan(wp / 2)
     omega_s = (2 / T) * tan(ws / 2)
     if irr_type == 'butter':
-        N, Wn = signal.buttord(omega_p, omega_s, Rp, As, True)
+        N, Wn = signal.buttord(omega_p, omega_s, gp, gs, True)
         b, a = signal.butter(N, Wn, band_type, analog=True)
     elif irr_type == 'chebyI':
-        N, Wn = signal.cheb1ord(omega_p, omega_s, Rp, As, True)
-        b, a = signal.cheby1(N, rp, Wn, band_type, analog=True, fs=sample_rate)  # rp
+        N, Wn = signal.cheb1ord(omega_p, omega_s, gp, gs, True)
+        b, a = signal.cheby1(N, Rp, Wn, band_type, analog=True)  # rp
     elif irr_type == 'chebyII':
-        N, Wn = signal.cheb2ord(omega_p, omega_s, Rp, As, True)
-        b, a = signal.cheby2(N, rs, Wn, band_type, analog=True)  # rs
+        N, Wn = signal.cheb2ord(omega_p, omega_s, gp, gs, True)
+        b, a = signal.cheby2(N, Rs, Wn, band_type, analog=True)  # rs
     else:
-        N, Wn = signal.ellipord(omega_p, omega_s, Rp, As, True)
-        b, a = signal.ellip(N, rp, rs, As, Wn, band_type, analog=True)  # rp,rs
+        N, Wn = signal.ellipord(omega_p, omega_s, gp, gs, True)
+        b, a = signal.ellip(N, Rp, Rs, Wn, band_type, analog=True)  # rp,rs
     if N > 30:
         raise Exception("Too Large N the filter might be meaningless")
     b_dig, a_dig = signal.bilinear(b, a, fs=Fs)
@@ -56,6 +56,10 @@ def IIR_filter_design(
         ax.set_ylabel('Amplitude [dB]')
         ax.margins(0, 0.1)
         ax.grid(which='both', axis='both')
+    if ax1:
+        if cla:
+            ax1.cla()
+        display.display_zero_pole(b_dig, a_dig, ax1)
 
     return b_dig, a_dig
 
@@ -68,11 +72,12 @@ def IIR_band_filter_design(
         fst1: float,
         fp2: Optional[float] = None,
         fst2: Optional[float] = None,
-        rs: Optional[float] = DEFAULT_RS_IN,
-        rp: Optional[float] = DEFAULT_RP_IN,
+        gs: Optional[float] = DEFAULT_GSTOP,
+        gp: Optional[float] = DEFAULT_GPASS,
         Rp: Optional[float] = DEFAULT_RP,
-        As: Optional[float] = DEFAULT_AS,
+        Rs: Optional[float] = DEFAULT_RS,
         ax=None,
+        ax1=None,
         cla: bool = False
 ):
     Fs = sample_rate
@@ -85,18 +90,19 @@ def IIR_band_filter_design(
     omega_s1 = (2 / T) * tan(ws1 / 2)
     omega_p2 = (2 / T) * tan(wp2 / 2)
     omega_s2 = (2 / T) * tan(ws2 / 2)
+    # print(omega_p1, omega_s1, omega_p2, omega_s2)
     if irr_type == 'butter':
-        N, Wn = signal.buttord([omega_p1, omega_p2], [omega_s1, omega_s2], Rp, As, True)
+        N, Wn = signal.buttord([omega_p1, omega_p2], [omega_s1, omega_s2], gp, gs, True)
         b, a = signal.butter(N, Wn, band_type, analog=True)
     elif irr_type == 'chebyI':
-        N, Wn = signal.cheb1ord([omega_p1, omega_p2], [omega_s1, omega_s2], Rp, As, True)
-        b, a = signal.cheby1(N, rp, Wn, band_type, analog=True)
+        N, Wn = signal.cheb1ord([omega_p1, omega_p2], [omega_s1, omega_s2], gp, gs, True)
+        b, a = signal.cheby1(N, Rp, Wn, band_type, analog=True)
     elif irr_type == 'chebyII':
-        N, Wn = signal.cheb2ord([omega_p1, omega_p2], [omega_s1, omega_s2], Rp, As, True)
-        b, a = signal.cheby2(N, rs, Wn, band_type, analog=True)
+        N, Wn = signal.cheb2ord([omega_p1, omega_p2], [omega_s1, omega_s2], gp, gs, True)
+        b, a = signal.cheby2(N, Rs, Wn, band_type, analog=True)
     else:
-        N, Wn = signal.ellipord([omega_p1, omega_p2], [omega_s1, omega_s2], Rp, As, True)
-        b, a = signal.ellip(N, rp, rs, Wn, band_type, analog=True)
+        N, Wn = signal.ellipord([omega_p1, omega_p2], [omega_s1, omega_s2], gp, gs, True)
+        b, a = signal.ellip(N, Rp, Rs, Wn, band_type, analog=True)
     if N > 30:
         raise Exception("Too Large N the filter might be meaningless")
     b_dig, a_dig = signal.bilinear(b, a, fs=Fs)
@@ -112,6 +118,11 @@ def IIR_band_filter_design(
         ax.margins(0, 0.1)
         ax.grid(which='both', axis='both')
 
+    if ax1:
+        if cla:
+            ax1.cla()
+        display.display_zero_pole(b_dig, a_dig, ax1)
+
     return b_dig, a_dig
 
 
@@ -121,12 +132,11 @@ def FIR_filter_design(
         win_type: str,
         fp1: float,
         fst1: float,
-        fp2: Optional[float] = None,
-        fst2: Optional[float] = None,
         N: int = DEFAULT_N_VALUE,
         Rp: Optional[float] = DEFAULT_RP,
-        As: Optional[float] = DEFAULT_AS,
+        Rs: Optional[float] = DEFAULT_RS,
         ax=None,
+        ax1=None,
         cla: bool = False
 ):
     wc1 = (fp1 + fst1) / 2
@@ -143,6 +153,11 @@ def FIR_filter_design(
         ax.margins(0, 0.1)
         ax.grid(which='both', axis='both')
 
+    if ax1:
+        if cla:
+            ax1.cla()
+        display.display_zero_pole(b, 1, ax1)
+
     return b
 
 
@@ -155,9 +170,8 @@ def FIR_band_filter_design(
         fp2: Optional[float] = None,
         fst2: Optional[float] = None,
         N: int = DEFAULT_N_VALUE,
-        Rp: Optional[float] = DEFAULT_RP,
-        As: Optional[float] = DEFAULT_AS,
         ax=None,
+        ax1=None,
         cla: bool = False
 ):
     wc1 = (fp1 + fst1) / 2
@@ -174,5 +188,10 @@ def FIR_band_filter_design(
         ax.set_ylabel('Amplitude [dB]')
         ax.margins(0, 0.1)
         ax.grid(which='both', axis='both')
+
+    if ax1:
+        if cla:
+            ax1.cla()
+        display.display_zero_pole(b, 1, ax1)
 
     return b

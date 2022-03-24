@@ -7,7 +7,7 @@ from .fit_filter import (
 )
 from .content import (
     ALLOWED_FILTER_TYPES, ALLOWED_WINDOW_TYPES, ALLOWED_FILTER,
-    ALLOWED_IIR_TYPES, DEFAULT_RP, DEFAULT_AS, DEFAULT_RS_IN, DEFAULT_RP_IN
+    ALLOWED_IIR_TYPES, DEFAULT_GPASS, DEFAULT_GSTOP, DEFAULT_RS, DEFAULT_RP
 )
 
 __all__ = [
@@ -20,8 +20,8 @@ __all__ = [
     'fit_FIR_filter',
     'ALLOWED_FILTER_TYPES',
     'ALLOWED_IIR_TYPES',
-    'DEFAULT_RP',
-    'DEFAULT_AS',
-    'DEFAULT_RS_IN',
-    'DEFAULT_RP_IN'
+    'DEFAULT_GPASS',
+    'DEFAULT_GSTOP',
+    'DEFAULT_RS',
+    'DEFAULT_RP'
 ]

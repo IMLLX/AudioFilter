@@ -11,7 +11,8 @@ def fit_IIR_filter(
         b: int,
         a: int
 ) -> Tuple[np.ndarray, int]:
-    filt_data = signal.filtfilt(b, a, audio, axis=0)
+    filt_data = signal.filtfilt(b, a, audio, axis=0, method='gust')
+    filt_data = filt_data / filt_data.max()
     return filt_data, sample_rate
 
 
@@ -21,4 +22,5 @@ def fit_FIR_filter(
         b: int,
 ) -> Tuple[np.ndarray, int]:
     filt_data = signal.filtfilt(b, 1, x=audio)
+    filt_data = filt_data / filt_data.max()
     return filt_data, sample_rate

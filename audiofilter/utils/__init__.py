@@ -10,6 +10,8 @@ from audiofilter.utils.path import (
     examples,
     DEFAULT_INPUT_DIR,
     DEFAULT_OUTPUT_DIR,
+    EXAMPLES_LIST,
+    get_example
 )
 
 __all__ = [
@@ -18,8 +20,10 @@ __all__ = [
     "DEFAULT_OUTPUT_DIR",
     "DEFAULT_INPUT_DIR",
     'DEFAULT_STFT_LEN',
+    'EXAMPLES_LIST',
     "get_local_path",
     "validate_path",
     'validate_output_path',
-    'examples'
+    'examples',
+    'get_example'
 ]
