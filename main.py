@@ -1,21 +1,38 @@
-import audiofilter as af
-from matplotlib import pyplot as plt
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from windows.AudioFilter import MainWindow
 
-audio, sample_rate = af.validate_load_audio(af.examples('me'))
+if __name__ == "__main__":
+    import sys
 
-plt.subplot(2, 2, 1)
-af.wave_plot(audio, sample_rate)
-plt.subplot(2, 2, 2)
+    try:
+        app = QApplication(sys.argv)
+        app.setApplicationName("Audio Filter")
+        app.setStyle("Fusion")
 
-af.freq_plot(audio, sample_rate)
+        # Fusion dark palette from https://gist.github.com/QuantumCD/6245215.
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        palette.setColor(QPalette.WindowText, Qt.white)
+        palette.setColor(QPalette.Base, QColor(25, 25, 25))
+        palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        palette.setColor(QPalette.ToolTipBase, Qt.white)
+        palette.setColor(QPalette.ToolTipText, Qt.white)
+        palette.setColor(QPalette.Text, Qt.white)
+        palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        palette.setColor(QPalette.ButtonText, Qt.white)
+        palette.setColor(QPalette.BrightText, Qt.red)
+        palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        palette.setColor(QPalette.HighlightedText, Qt.black)
+        app.setPalette(palette)
+        app.setStyleSheet(
+            "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"
+        )
 
-audio, sample_rate = af.add_background_noise(audio, sample_rate, background_noise='gaussian')
+        window = MainWindow()
 
-plt.subplot(2, 2, 3)
-af.wave_plot(audio, sample_rate)
-plt.subplot(2, 2, 4)
-af.freq_plot(audio, sample_rate)
-
-plt.show()
-
-af.play_sound(audio, sample_rate)
+        app.exec_()
+    except Exception as e:
+        print('Error', e)

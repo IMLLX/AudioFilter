@@ -22,6 +22,7 @@ def IIR_filter_design(
         Rs: Optional[float] = DEFAULT_RS,
         ax=None,
         ax1=None,
+        ax2=None,
         cla: bool = False
 ):
     Fs = sample_rate
@@ -45,11 +46,11 @@ def IIR_filter_design(
     if N > 30:
         raise Exception("Too Large N the filter might be meaningless")
     b_dig, a_dig = signal.bilinear(b, a, fs=Fs)
+    w, h = signal.freqz(b_dig, a_dig)
 
     if ax:
         if cla:
             ax.cla()
-        w, h = signal.freqz(b_dig, a_dig)
         ax.semilogx(w / (2 * pi) * Fs, 20 * np.log10(abs(h)))
         ax.set_title('filter frequency response')
         ax.set_xlabel('Frequency [Hz / second]')
@@ -60,6 +61,11 @@ def IIR_filter_design(
         if cla:
             ax1.cla()
         display.display_zero_pole(b_dig, a_dig, ax1)
+
+    if ax2:
+        if cla:
+            ax2.cla()
+        display.display_angle_plot(w / (2 * pi) * Fs, h, ax2)
 
     return b_dig, a_dig
 
@@ -78,6 +84,7 @@ def IIR_band_filter_design(
         Rs: Optional[float] = DEFAULT_RS,
         ax=None,
         ax1=None,
+        ax2=None,
         cla: bool = False
 ):
     Fs = sample_rate
@@ -107,10 +114,11 @@ def IIR_band_filter_design(
         raise Exception("Too Large N the filter might be meaningless")
     b_dig, a_dig = signal.bilinear(b, a, fs=Fs)
 
+    w, h = signal.freqz(b_dig, a_dig)
+
     if ax:
         if cla:
             ax.cla()
-        w, h = signal.freqz(b_dig, a_dig)
         ax.semilogx(w / (2 * pi) * Fs, 20 * np.log10(abs(h)))
         ax.set_title('filter frequency response')
         ax.set_xlabel('Frequency [Hz / second]')
@@ -122,6 +130,11 @@ def IIR_band_filter_design(
         if cla:
             ax1.cla()
         display.display_zero_pole(b_dig, a_dig, ax1)
+
+    if ax2:
+        if cla:
+            ax2.cla()
+        display.display_angle_plot(w / (2 * pi) * Fs, h, ax2)
 
     return b_dig, a_dig
 
@@ -137,15 +150,16 @@ def FIR_filter_design(
         Rs: Optional[float] = DEFAULT_RS,
         ax=None,
         ax1=None,
+        ax2=None,
         cla: bool = False
 ):
     wc1 = (fp1 + fst1) / 2
     b = signal.firwin(N, wc1, window=win_type, fs=sample_rate, pass_zero=band_type)
+    w, h = signal.freqz(b, 1)
 
     if ax:
         if cla:
             ax.cla()
-        w, h = signal.freqz(b, 1)
         ax.semilogx(w / (2 * pi) * sample_rate, 20 * np.log10(abs(h)))
         ax.set_title('filter frequency response')
         ax.set_xlabel('Frequency [Hz / second]')
@@ -157,6 +171,11 @@ def FIR_filter_design(
         if cla:
             ax1.cla()
         display.display_zero_pole(b, 1, ax1)
+
+    if ax2:
+        if cla:
+            ax2.cla()
+        display.display_angle_plot(w / (2 * pi) * sample_rate, h, ax2)
 
     return b
 
@@ -172,16 +191,17 @@ def FIR_band_filter_design(
         N: int = DEFAULT_N_VALUE,
         ax=None,
         ax1=None,
+        ax2=None,
         cla: bool = False
 ):
     wc1 = (fp1 + fst1) / 2
     wc2 = (fp2 + fst2) / 2
     b = signal.firwin(N, [wc1, wc2], window=win_type, fs=sample_rate, pass_zero=band_type)
+    w, h = signal.freqz(b, 1)
 
     if ax:
         if cla:
             ax.cla()
-        w, h = signal.freqz(b, 1)
         ax.semilogx(w / (2 * pi) * sample_rate, 20 * np.log10(abs(h)))
         ax.set_title('filter frequency response')
         ax.set_xlabel('Frequency [Hz / second]')
@@ -193,5 +213,10 @@ def FIR_band_filter_design(
         if cla:
             ax1.cla()
         display.display_zero_pole(b, 1, ax1)
+
+    if ax2:
+        if cla:
+            ax2.cla()
+        display.display_angle_plot(w / (2 * pi) * sample_rate, h, ax2)
 
     return b

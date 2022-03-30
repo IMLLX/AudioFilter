@@ -2,10 +2,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtMultimedia import *
-from mainwindow import Ui_MainWindow
-from filterdesign_window import Ui_FilterDesign
-from stft_window import Ui_STFT
-from addnoise_window import Ui_AddNoise
+from .mainwindow import Ui_MainWindow
+from .filterdesign_window import Ui_FilterDesign
+from .stft_window import Ui_STFT
+from .addnoise_window import Ui_AddNoise
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 import audiofilter as af
@@ -384,6 +384,7 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
                                                        Rs=rs,
                                                        ax=self.filter_axes[0],
                                                        ax1=self.filter_axes[1],
+                                                       ax2=self.filter_axes[2],
                                                        cla=True)
                     # self.canvas.draw_idle()
                     # self.filter_canvas.draw_idle()
@@ -405,6 +406,7 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
                                                             Rs=rs,
                                                             ax=self.filter_axes[0],
                                                             ax1=self.filter_axes[1],
+                                                            ax2=self.filter_axes[2],
                                                             cla=True)
                     # self.canvas.draw_idle()
                     # self.filter_canvas.draw_idle()
@@ -422,9 +424,8 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
                                                     fst1,
                                                     ax=self.filter_axes[0],
                                                     ax1=self.filter_axes[1],
+                                                    ax2=self.filter_axes[2],
                                                     cla=True)
-                    # self.canvas.draw_idle()
-                    # self.filter_canvas.draw_idle()
                     if b.any():
                         self.tem_audio, self.tem_sample_rate = af.fit_FIR_filter(self.audio, self.sample_rate, b)
                         af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0])
@@ -440,10 +441,9 @@ class FilterDesign(QMainWindow, Ui_FilterDesign):
                                                          fp2,
                                                          fst2,
                                                          ax=self.filter_axes[0],
-                                                         # ax1=self.filter_axes[1],
+                                                         ax1=self.filter_axes[1],
+                                                         ax2=self.filter_axes[2],
                                                          cla=True)
-                    # self.canvas.draw_idle()
-                    # self.filter_canvas.draw_idle()
                     if b.any():
                         self.tem_audio, self.tem_sample_rate = af.fit_FIR_filter(self.audio, self.sample_rate, b)
                         af.wave_plot(self.tem_audio, self.tem_sample_rate, self.axes[0])
@@ -564,37 +564,36 @@ class StftWindow(QMainWindow, Ui_STFT):
         box = QMessageBox(QMessageBox.Warning, title, str(message))
         box.exec_()
 
-
-if __name__ == "__main__":
-    import sys
-
-    try:
-        app = QApplication(sys.argv)
-        app.setApplicationName("Audio Filter")
-        app.setStyle("Fusion")
-
-        # Fusion dark palette from https://gist.github.com/QuantumCD/6245215.
-        palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        palette.setColor(QPalette.WindowText, Qt.white)
-        palette.setColor(QPalette.Base, QColor(25, 25, 25))
-        palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-        palette.setColor(QPalette.ToolTipBase, Qt.white)
-        palette.setColor(QPalette.ToolTipText, Qt.white)
-        palette.setColor(QPalette.Text, Qt.white)
-        palette.setColor(QPalette.Button, QColor(53, 53, 53))
-        palette.setColor(QPalette.ButtonText, Qt.white)
-        palette.setColor(QPalette.BrightText, Qt.red)
-        palette.setColor(QPalette.Link, QColor(42, 130, 218))
-        palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-        palette.setColor(QPalette.HighlightedText, Qt.black)
-        app.setPalette(palette)
-        app.setStyleSheet(
-            "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"
-        )
-
-        window = MainWindow()
-
-        app.exec_()
-    except Exception as e:
-        print('Error', e)
+# if __name__ == "__main__":
+#     import sys
+#
+#     try:
+#         app = QApplication(sys.argv)
+#         app.setApplicationName("Audio Filter")
+#         app.setStyle("Fusion")
+#
+#         # Fusion dark palette from https://gist.github.com/QuantumCD/6245215.
+#         palette = QPalette()
+#         palette.setColor(QPalette.Window, QColor(53, 53, 53))
+#         palette.setColor(QPalette.WindowText, Qt.white)
+#         palette.setColor(QPalette.Base, QColor(25, 25, 25))
+#         palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+#         palette.setColor(QPalette.ToolTipBase, Qt.white)
+#         palette.setColor(QPalette.ToolTipText, Qt.white)
+#         palette.setColor(QPalette.Text, Qt.white)
+#         palette.setColor(QPalette.Button, QColor(53, 53, 53))
+#         palette.setColor(QPalette.ButtonText, Qt.white)
+#         palette.setColor(QPalette.BrightText, Qt.red)
+#         palette.setColor(QPalette.Link, QColor(42, 130, 218))
+#         palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+#         palette.setColor(QPalette.HighlightedText, Qt.black)
+#         app.setPalette(palette)
+#         app.setStyleSheet(
+#             "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"
+#         )
+#
+#         window = MainWindow()
+#
+#         app.exec_()
+#     except Exception as e:
+#         print('Error', e)

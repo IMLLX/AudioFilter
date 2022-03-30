@@ -86,3 +86,9 @@ def display_zero_pole(b, a, ax):
     ax.set_xlabel('Real')
     ax.set_ylim((-1.5, 1.5))
     ax.set_ylabel('Imag')
+
+
+def display_angle_plot(f, h, ax):
+    ax.plot(f, np.angle(h))
+    ax.set_xlabel('Frequency [Hz]')
+    ax.set_ylabel('Angle [rad]')
