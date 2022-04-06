@@ -1,13 +1,13 @@
 # AudioFilter
-## Feature
 
-1. 播放音频
-2. 频域、时域图
-3. 加噪
-4. 滤波
-5. 倍速
+## 如何使用
 
-## TODO-LIST
+1. 用Pycharm打开文件夹
 
-- 界面设计
-- ...
+2. 在终端输入：
+
+   ```
+   pip install requirements.txt
+   ```
+
+3. 运行 main.py
