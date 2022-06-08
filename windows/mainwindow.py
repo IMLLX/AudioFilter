@@ -5,10 +5,11 @@
 # Created by: PyQt5 UI code generator 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
-
+import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+icon_base_path = os.path.join(os.path.dirname(__file__), 'assets', 'images')
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -53,7 +54,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.currentTimeLabel = QtWidgets.QLabel(self.centralWidget)
         self.currentTimeLabel.setMinimumSize(QtCore.QSize(80, 0))
-        self.currentTimeLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.currentTimeLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
         self.currentTimeLabel.setObjectName("currentTimeLabel")
         self.horizontalLayout_4.addWidget(self.currentTimeLabel)
         self.timeSlider = QtWidgets.QSlider(self.centralWidget)
@@ -62,7 +63,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.addWidget(self.timeSlider)
         self.totalTimeLabel = QtWidgets.QLabel(self.centralWidget)
         self.totalTimeLabel.setMinimumSize(QtCore.QSize(80, 0))
-        self.totalTimeLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.totalTimeLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.totalTimeLabel.setObjectName("totalTimeLabel")
         self.horizontalLayout_4.addWidget(self.totalTimeLabel)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
@@ -72,42 +73,47 @@ class Ui_MainWindow(object):
         self.previousButton = QtWidgets.QPushButton(self.centralWidget)
         self.previousButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./windows/assets/images/control-skip-180.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "control-skip-180.png")), QtGui.QIcon.Normal,
+                       QtGui.QIcon.Off)
         self.previousButton.setIcon(icon)
         self.previousButton.setObjectName("previousButton")
         self.horizontalLayout_5.addWidget(self.previousButton)
         self.playButton = QtWidgets.QPushButton(self.centralWidget)
         self.playButton.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("./windows/assets/images/control.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "control.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.playButton.setIcon(icon1)
         self.playButton.setObjectName("playButton")
         self.horizontalLayout_5.addWidget(self.playButton)
         self.pauseButton = QtWidgets.QPushButton(self.centralWidget)
         self.pauseButton.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("./windows/assets/images/control-pause.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "control-pause.png")), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.pauseButton.setIcon(icon2)
         self.pauseButton.setObjectName("pauseButton")
         self.horizontalLayout_5.addWidget(self.pauseButton)
         self.stopButton = QtWidgets.QPushButton(self.centralWidget)
         self.stopButton.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("./windows/assets/images/control-stop-square.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "control-stop-square.png")), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.stopButton.setIcon(icon3)
         self.stopButton.setObjectName("stopButton")
         self.horizontalLayout_5.addWidget(self.stopButton)
         self.nextButton = QtWidgets.QPushButton(self.centralWidget)
         self.nextButton.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("./windows/assets/images/control-skip.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "control-skip.png")), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.nextButton.setIcon(icon4)
         self.nextButton.setObjectName("nextButton")
         self.horizontalLayout_5.addWidget(self.nextButton)
         self.viewButton = QtWidgets.QPushButton(self.centralWidget)
         self.viewButton.setText("")
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("./windows/assets/images/application-image.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "application-image.png")), QtGui.QIcon.Normal,
+                        QtGui.QIcon.Off)
         self.viewButton.setIcon(icon5)
         self.viewButton.setCheckable(True)
         self.viewButton.setObjectName("viewButton")
@@ -116,7 +122,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addItem(spacerItem)
         self.label = QtWidgets.QLabel(self.centralWidget)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("./windows/assets/images/speaker-volume.png"))
+        self.label.setPixmap(QtGui.QPixmap(os.path.join(icon_base_path, "speaker-volume.png")))
         self.label.setObjectName("label")
         self.horizontalLayout_5.addWidget(self.label)
         self.volumeSlider = QtWidgets.QSlider(self.centralWidget)
